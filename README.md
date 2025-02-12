@@ -8,6 +8,17 @@ cd ai-doc-bot/
 yarn
 ```
 
+DB Setup
+```sh
+# Install
+yarn add chromadb chromadb-default-embed 
+
+# Run the Chroma backend
+sudo docker pull chromadb/chroma
+sudo docker run -p 8000:8000 chromadb/chroma
+```
+
+
 ## Run
 ```sh
 yarn dev

@@ -1,20 +1,8 @@
 const { driver } = require('@rocket.chat/sdk');
 const respmap = require('./reply');
-const config = require('./config');
+const config = require('../config/conf');
 
 console.log(config)
-
-
-// const {
-//     ROCKETCHAT_HOST,
-//     CHAT_USER,
-//     ROCKETCHAT_PASSWORD,
-// } = process.env;
-
-// const SSL = process.env.SSL === 'true';
-// const RESPOND_TO_DM = process.env.RESPOND_TO_DM === 'true';
-
-// console.log(ROCKETCHAT_HOST, CHAT_USER, ROCKETCHAT_PASSWORD)
 
 let myUserId; // Declare user ID variable
 
