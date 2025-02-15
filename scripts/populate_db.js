@@ -1,21 +1,29 @@
 import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';
-import { pipeline } from '@xenova/transformers';
+import { pipeline, env } from '@xenova/transformers';
 import { ChromaClient } from 'chromadb';
 import { v4 as uuidv4 } from 'uuid';
+
+env.backend = 'onnxruntime';
+env.allowRemoteModels = false;
+env.localModelPath = '/home/rey/Documents/ai-doc-assit/model_convert/models/';
+
 
 /**
  * Splits text into chunks of at most maxChunkSize characters.
  * Attempts to break on newlines or spaces.
  */
 function chunkText(text, maxChunkSize = 1000) {
+  text = text.replace(/\n/g, " ");
+  text = text.split(/\s+/).join(" ");
+  
   const chunks = [];
   let start = 0;
   while (start < text.length) {
     let end = start + maxChunkSize;
     if (end < text.length) {
-            const lastNewline = text.lastIndexOf('\n', end);
+      const lastNewline = text.lastIndexOf('\n', end);
       const lastSpace = text.lastIndexOf(' ', end);
       if (lastNewline > start) {
         end = lastNewline;
@@ -43,7 +51,7 @@ function computeMD5(text) {
 function processFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   console.log(content);
-    const chunks = chunkText(content, 1000);   return chunks.map((chunk, index) => {
+  const chunks = chunkText(content, 1000); return chunks.map((chunk, index) => {
     const chunkId = uuidv4();
     const mdHash = computeMD5(chunk);
     const baseName = path.basename(filePath, path.extname(filePath));
@@ -76,22 +84,23 @@ async function loadAndProcessFiles(dir) {
 }
 
 async function main() {
-    const dataDir = path.resolve('data/processed');
+  const dataDir = path.resolve('data/processed');
   const chunks = await loadAndProcessFiles(dataDir);
   console.log(`Processed ${chunks.length} chunks from files in ${dataDir}`);
 
   console.log("Loading local embedding model...");
   const embedder = await pipeline('feature-extraction', 'mixedbread-ai/mxbai-embed-xsmall-v1');
 
-    for (const chunk of chunks) {
-        const embedding = await embedder(chunk.content, { pooling: 'mean', normalize: true });
-    chunk.embedding = embedding;   }
+  for (const chunk of chunks) {
+    const embedding = await embedder(chunk.content, { pooling: 'mean', normalize: true });
+    chunk.embedding = Array.from(embedding.data);
+  }
   console.log("Embeddings generated for all chunks.");
 
-    console.log("Connecting to local ChromaDB...");
+  console.log("Connecting to local ChromaDB...");
   const chroma = new ChromaClient({ path: "http://localhost:8000" });
 
-    let collection;
+  let collection;
   try {
     collection = await chroma.getCollection({ name: "docs" });
     console.log("Using existing collection 'docs'.");
@@ -100,16 +109,29 @@ async function main() {
     console.log("Created collection 'docs'.");
   }
 
-    const ids = chunks.map(c => c.id);
+  const ids = chunks.map(c => c.id);
   const documents = chunks.map(c => c.content);
-    const embeddings = chunks.map(c => c.embedding);
+  const embeddings = chunks.map(c => c.embedding);
   const metadatas = chunks.map(c => ({
     text_chunk_filename: c.text_chunk_filename,
     md_hash: c.md_hash,
     source_file: c.source_file,
   }));
 
-    console.log("Adding chunks to the collection...");
+  console.log("Adding chunks to the collection...");
+  console.log({
+    ids,
+    documents,
+    embeddings,
+    metadatas,
+  })
+
+  console.log("Sample ID:", ids[0]);
+console.log("Sample Document:", documents[0]);
+console.log("Sample Embedding (length):", embeddings[0].length);
+console.log("Sample Metadata:", metadatas[0]);
+
+
   await collection.add({
     ids,
     documents,

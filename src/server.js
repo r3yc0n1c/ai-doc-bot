@@ -1,6 +1,7 @@
 const { driver } = require('@rocket.chat/sdk');
 const respmap = require('./reply');
 const config = require('../config/conf');
+const { default: answerQuery } = require('../scripts/check_qna');
 
 console.log(config)
 
@@ -35,12 +36,14 @@ const processMessages = async (err, message, messageOptions) => {
         console.log('got message ' + message.msg);
 
 
-        var response;
-        if (message.msg in respmap) {
-            response = respmap[message.msg];
-        } else {
-            response = message.u.username + ', how can I' + ' help you with "' + message.msg + '"';
-        }
+        // var response;
+        // if (message.msg in respmap) {
+        //     response = respmap[message.msg];
+        // } else {
+        //     response = message.u.username + ', how can I' + ' help you with "' + message.msg + '"';
+        // }
+
+        const response = await answerQuery(message.msg);
         try {
             const sentmsg = await driver.sendToRoomId(response, message.rid);
         } catch (error) {

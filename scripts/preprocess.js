@@ -45,7 +45,9 @@ function convertMarkdownToPlainText(inputPath, outputPath) {
   }
 }
 
-const inputFile = 'data/raw_doc/open-source-projects/server/server-environment-setup/linux.md';
-const outputFile = 'data/processed/linux.txt';
+// const inputFile = 'data/raw_doc/open-source-projects/server/server-environment-setup/linux.md';
+// const outputFile = 'data/processed/linux.txt';
 
+const inputFile = 'data/raw_doc/apps-engine/getting-started/creating-an-app.md';
+const outputFile = 'data/processed/creating-an-app.txt';
 convertMarkdownToPlainText(inputFile, outputFile);
