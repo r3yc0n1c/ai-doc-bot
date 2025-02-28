@@ -1,5 +1,5 @@
 ## AI Doc Assitance app for Rocket.Chat
-> *POC for [💡 AI Docs Assistant App](https://github.com/RocketChat/google-summer-of-code/blob/main/google-summer-of-code-2025.md#-ai-docs-assistant-app) @ [GSoC 2025, Rocket.Chat](https://github.com/RocketChat/google-summer-of-code/blob/main/google-summer-of-code-2025.md)*
+> *POC for [💡 Perfect AI Docs Assistant App](https://github.com/RocketChat/google-summer-of-code/blob/main/google-summer-of-code-2025.md#-perfect-ai-docs-assistant-app) @ [GSoC 2025, Rocket.Chat](https://github.com/RocketChat/google-summer-of-code/blob/main/google-summer-of-code-2025.md)*
 
 ## Installation
 ```sh
